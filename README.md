@@ -32,10 +32,10 @@ When executing an action on the pendant it will generate a hotkey-press to inter
 
 **Single press**
 
-- Button X       -     _none_     - Change axis to X
-- Button Y       -     _none_     - Change axis to Y
-- Button Z       -     _none_     - Change axis to Z
-- Button RANGE   - CTRL+SHIFT+n - Change step size (0.001 mm, 0.01 mm, 0.1 mm, 1 mm, 10 mm), _n_ is numbers 1 to 5
+- Button X       - _none_ - Change axis to X
+- Button Y       - _none_ - Change axis to Y
+- Button Z       - _none_ - Change axis to Z
+- Button RANGE   - CTRL+SHIFT+_n_ - Change step size (0.001 mm, 0.01 mm, 0.1 mm, 1 mm, 10 mm), _n_ is numbers 1 to 5
 - Button STOP    - CTRL+SHIFT+S - Stop
 - Encoder Switch - CTRL+SHIFT+U - Unlock
 
