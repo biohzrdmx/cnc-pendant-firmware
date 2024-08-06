@@ -31,11 +31,11 @@ EasyButton btnZ(PIN_BTN_Z, BTN_DEBOUNCE, true);
 EasyButton btnRange(PIN_BTN_RANGE, BTN_DEBOUNCE, true);
 EasyButton btnStop(PIN_BTN_STOP, BTN_DEBOUNCE, true);
 
-#define ENCODER_PIN_BTN 7
-#define ENCODER_PIN_A   8
-#define ENCODER_PIN_B   9
-RotaryEncoder encoder(ENCODER_PIN_A, ENCODER_PIN_B);
-EasyButton btnEncoder(ENCODER_PIN_BTN, BTN_DEBOUNCE, true);
+#define PIN_ENCODER_BTN 7
+#define PIN_ENCODER_A   8
+#define PIN_ENCODER_B   9
+RotaryEncoder encoder(PIN_ENCODER_A, PIN_ENCODER_B);
+EasyButton btnEncoder(PIN_ENCODER_BTN, BTN_DEBOUNCE, true);
 int oldPos = 0;
 
 #define RANGE_0001 0
@@ -124,8 +124,8 @@ void setup() {
   // Initialize keyboard
   Keyboard.begin();
   // Attach interrupts
-  PcInt::attachInterrupt(ENCODER_PIN_A, interruptHandler, CHANGE);
-  PcInt::attachInterrupt(ENCODER_PIN_B, interruptHandler, CHANGE);
+  PcInt::attachInterrupt(PIN_ENCODER_A, interruptHandler, CHANGE);
+  PcInt::attachInterrupt(PIN_ENCODER_B, interruptHandler, CHANGE);
 }
 
 void drawCenteredString(const String &buf, int x, int y = -1)
