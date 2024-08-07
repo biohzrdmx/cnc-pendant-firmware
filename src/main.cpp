@@ -43,7 +43,12 @@ int oldPos = 0;
 #define RANGE_01   2
 #define RANGE_1    3
 #define RANGE_10   4
-unsigned int range = RANGE_1;
+unsigned int range_xy = RANGE_1;
+unsigned int range_z = RANGE_01;
+
+#define DIRECTION_INCREASE 0
+#define DIRECTION_DECREASE 1
+unsigned int direction = DIRECTION_INCREASE;
 
 #define AXIS_X 0
 #define AXIS_Y 1
@@ -69,7 +74,7 @@ unsigned int state = STATE_IDLE;
 #define ACTION_STOP      8
 #define ACTION_HOME_XY   9
 #define ACTION_RESET     10
-#define ACTION_UNLOCK    11
+#define ACTION_DIRECTION 11
 #define ACTION_ZERO_ALL  12
 #define ACTION_STEP_UP   13
 #define ACTION_STEP_DOWN 14
@@ -120,7 +125,7 @@ void setup() {
   btnStop.onPressedFor(2000, onLongPressedStop);
   btnEncoder.onPressedFor(2000, onLongPressedEncoder);
   // Setup timers
-  tmrReset.init(3000);
+  tmrReset.init(5000);
   // Initialize keyboard
   Keyboard.begin();
   // Attach interrupts
@@ -165,7 +170,7 @@ void loop() {
         break;
         case AXIS_Z:
           Keyboard.press(KEY_LEFT_SHIFT);
-          Keyboard.press(KEY_DOWN_ARROW);
+          Keyboard.press(KEY_UP_ARROW);
           Keyboard.releaseAll();
         break;
       }
@@ -185,7 +190,7 @@ void loop() {
         break;
         case AXIS_Z:
           Keyboard.press(KEY_LEFT_SHIFT);
-          Keyboard.press(KEY_UP_ARROW);
+          Keyboard.press(KEY_DOWN_ARROW);
           Keyboard.releaseAll();
         break;
       }
@@ -254,12 +259,22 @@ void redraw() {
       case ACTION_ZERO_ALL:
         display.print(F("RESET XYZ ZERO"));
       break;
-      case ACTION_UNLOCK:
-        display.print(F("UNLOCK"));
+      case ACTION_DIRECTION:
+        display.print(F("STEP SIZE"));
+        display.setCursor(10, 22);
+        switch (direction) {
+          case DIRECTION_INCREASE:
+            display.print(F("INCREMENT"));
+          break;
+          case DIRECTION_DECREASE:
+            display.print(F("DECREMENT"));
+          break;
+        }
       break;
     }
     display.drawLine(1, 42, 127, 42, SSD1306_WHITE);
-    display.drawLine(96, 42, 96, 63, SSD1306_WHITE);
+    display.drawLine(104, 42, 104, 63, SSD1306_WHITE);
+    display.drawLine(72, 42, 72, 63, SSD1306_WHITE);
     drawAxis();
     drawRange();
     display.display();
@@ -268,7 +283,7 @@ void redraw() {
 }
 
 void drawAxis() {
-  display.setCursor(109, 50);
+  display.setCursor(114, 50);
   switch(axis) {
     case AXIS_X:
       display.print(F("X"));
@@ -284,7 +299,7 @@ void drawAxis() {
 
 void drawRange() {
   display.setCursor(10, 50);
-  switch(range) {
+  switch(axis == AXIS_Z ? range_z : range_xy) {
     case RANGE_0001:
       display.print(F("0.001 MM"));
     break;
@@ -301,6 +316,40 @@ void drawRange() {
       display.print(F("10 MM"));
     break;
   }
+  display.setCursor(80, 50);
+  switch (direction) {
+    case DIRECTION_INCREASE:
+      display.print(F("INC"));
+    break;
+    case DIRECTION_DECREASE:
+      display.print(F("DEC"));
+    break;
+  }
+}
+
+void sendRange() {
+  if (axis == AXIS_Z) {
+    Keyboard.press(KEY_LEFT_SHIFT);
+  }
+  Keyboard.press(KEY_LEFT_CTRL);
+  switch(axis == AXIS_Z ? range_z : range_xy) {
+    case RANGE_0001:
+      Keyboard.press('1');
+    break;
+    case RANGE_001:
+      Keyboard.press('2');
+    break;
+    case RANGE_01:
+      Keyboard.press('3');
+    break;
+    case RANGE_1:
+      Keyboard.press('4');
+    break;
+    case RANGE_10:
+      Keyboard.press('5');
+    break;
+  }
+  Keyboard.releaseAll();
 }
 
 void onPressedX() {
@@ -309,6 +358,7 @@ void onPressedX() {
   tmrReset.restart();
   reset = true;
   axis = AXIS_X;
+  sendRange();
 }
 
 void onPressedY() {
@@ -317,6 +367,7 @@ void onPressedY() {
   tmrReset.restart();
   reset = true;
   axis = AXIS_Y;
+  sendRange();
 }
 
 void onPressedZ() {
@@ -325,38 +376,38 @@ void onPressedZ() {
   tmrReset.restart();
   reset = true;
   axis = AXIS_Z;
+  sendRange();
 }
 
 void onPressedRange() {
-  Keyboard.press(KEY_LEFT_SHIFT);
-  Keyboard.press(KEY_LEFT_CTRL);
-  switch(range) {
-    case RANGE_0001:
-      range = RANGE_001;
-      Keyboard.press('1');
-    break;
-    case RANGE_001:
-      range = RANGE_01;
-      Keyboard.press('2');
-    break;
-    case RANGE_01:
-      range = RANGE_1;
-      Keyboard.press('3');
-    break;
-    case RANGE_1:
-      range = RANGE_10;
-      Keyboard.press('4');
-    break;
-    case RANGE_10:
-      range = RANGE_0001;
-      Keyboard.press('5');
-    break;
-  }
-  Keyboard.releaseAll();
+  int range = axis == AXIS_Z ? range_z : range_xy;
   action = ACTION_RANGE;
   update = true;
   tmrReset.restart();
   reset = true;
+  switch(range) {
+    case RANGE_0001:
+      range = direction == DIRECTION_INCREASE ? RANGE_001 : RANGE_0001;
+    break;
+    case RANGE_001:
+      range = direction == DIRECTION_INCREASE ? RANGE_01 : RANGE_0001;
+    break;
+    case RANGE_01:
+      range = direction == DIRECTION_INCREASE ? RANGE_1 : RANGE_001;
+    break;
+    case RANGE_1:
+      range = direction == DIRECTION_INCREASE ? RANGE_10 : RANGE_01;
+    break;
+    case RANGE_10:
+      range = direction == DIRECTION_INCREASE ? RANGE_10 : RANGE_1;
+    break;
+  }
+  if (axis == AXIS_Z) {
+    range_z = range;
+  } else {
+    range_xy = range;
+  }
+  sendRange();
 }
 
 void onPressedStop() {
@@ -371,14 +422,18 @@ void onPressedStop() {
 }
 
 void onPressedEncoder() {
-  action = ACTION_UNLOCK;
+  action = ACTION_DIRECTION;
   update = true;
   tmrReset.restart();
   reset = true;
-  Keyboard.press(KEY_LEFT_SHIFT);
-  Keyboard.press(KEY_LEFT_CTRL);
-  Keyboard.press('u');
-  Keyboard.releaseAll();
+  switch (direction) {
+    case DIRECTION_INCREASE:
+      direction = DIRECTION_DECREASE;
+    break;
+    case DIRECTION_DECREASE:
+      direction = DIRECTION_INCREASE;
+    break;
+  }
 }
 
 void onLongPressedX() {

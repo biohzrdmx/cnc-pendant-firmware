@@ -9,6 +9,7 @@ void loop();
 void redraw();
 void drawAxis();
 void drawRange();
+void sendRange();
 void interruptHandler();
 
 void onPressedX();

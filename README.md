@@ -35,9 +35,9 @@ When executing an action on the pendant it will generate a hotkey-press to inter
 - Button X       - _none_ - Change axis to X
 - Button Y       - _none_ - Change axis to Y
 - Button Z       - _none_ - Change axis to Z
-- Button RANGE   - CTRL+SHIFT+_n_ - Change step size (0.001 mm, 0.01 mm, 0.1 mm, 1 mm, 10 mm), _n_ is numbers 1 to 5
+- Button RANGE   - CTRL+(SHIFT+)_n_ - Change step size (0.001 mm, 0.01 mm, 0.1 mm, 1 mm, 10 mm), _n_ is numbers 1 to 5 (for XY axis JUST CTRL, for z axis CTRL+SHIFT)
 - Button STOP    - CTRL+SHIFT+S - Stop
-- Encoder Switch - CTRL+SHIFT+U - Unlock
+- Encoder Switch - _none_ - Toggle increment/decrement step size
 
 **Long press**
 
@@ -50,8 +50,8 @@ When executing an action on the pendant it will generate a hotkey-press to inter
 
 **Encoder rotation**
 
-- Clock-wise         - For axis X LEFT  - For axis Y DOWN - For axis Z SHIFT + DOWN
-- Counter-clock-wise - For axis X RIGHT - For axis Y UP   - For axis Z SHIFT + UP
+- Clock-wise         - For axis X LEFT  - For axis Y DOWN - For axis Z SHIFT + UP
+- Counter-clock-wise - For axis X RIGHT - For axis Y UP   - For axis Z SHIFT + DOWN
 
 ## Licensing
 
